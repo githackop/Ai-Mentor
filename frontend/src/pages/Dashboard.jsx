@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
 import { useSidebar } from "../context/SidebarContext";
 import { useTranslation } from "react-i18next";
@@ -290,6 +288,14 @@ const Dashboard = () => {
       return continueData;
     });
 
+  const isCoursePurchased = (courseId) =>
+    user?.purchasedCourses?.some((purchased) => purchased.courseId == courseId);
+
+  const getCourseDestination = (courseId) =>
+    isCoursePurchased(courseId)
+      ? `/learning/${courseId}`
+      : `/course-preview/${courseId}`;
+
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const filteredMyCourses = myCourses.filter((course) => {
     if (!normalizedSearchQuery) return true;
@@ -339,41 +345,17 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas-alt flex flex-col">
-        <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-        <Sidebar activePage="dashboard" />
-        <div
-          className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
-            sidebarCollapsed ? "lg:ml-20" : "lg:ml-80"
-          }`}
-        >
-          <main className="flex-1 mt-10 overflow-x-hidden overflow-y-auto bg-canvas-alt p-6">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-muted">{t("dashboard.loading")}</div>
-            </div>
-          </main>
+      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-canvas-alt p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-muted">{t("dashboard.loading")}</div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-canvas-alt flex flex-col">
-      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-
-      <Sidebar activePage="dashboard" />
-
-      {/* Main Content */}
-      <div
-        className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
-          sidebarCollapsed ? "lg:ml-20" : "lg:ml-80"
-        }`}
-      >
-        {/* Header */}
-
-        {/* Dashboard Content */}
-        <main className="flex-1 mt-3 overflow-x-hidden overflow-y-auto bg-canvas-alt p-6">
-          <div className="max-w-7xl pt-16 mx-auto space-y-8">
+    <main className="flex-1 overflow-x-hidden overflow-y-auto bg-canvas-alt p-6">
+      <div className="max-w-7xl pt-16 mx-auto space-y-8">
             {/* Stats Cards */}
             <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {dynamicStatsCards.map((card, index) => {
@@ -408,7 +390,7 @@ const Dashboard = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {coursesData.allCourses.slice(0, 13).map((course, index) => (
-                    <Link to={`/learning/${course.id}`} key={index}>
+                    <Link to={getCourseDestination(course.id)} key={index}>
                       <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm h-full hover:shadow-lg hover:-translate-y-1 hover:border-teal-500/40 transition-all duration-300">
                         <div className="relative">
                           <img
@@ -645,9 +627,7 @@ const Dashboard = () => {
             </div>
 
           </div>
-        </main>
-      </div>
-    </div>
+    </main>
   );
 };
 
