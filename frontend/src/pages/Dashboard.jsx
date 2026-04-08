@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useSidebar } from "../context/SidebarContext";
 import { useTranslation } from "react-i18next";
 import API_BASE_URL from "../lib/api";
 import {
@@ -26,12 +25,12 @@ import {
 
 const Dashboard = () => {
   const { t } = useTranslation();
-  const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useSidebar();
+
   const [coursesData, setCoursesData] = useState({
     statsCards: [],
     allCourses: [],
-  });
-  const [searchQuery, setSearchQuery] = useState("");
+  })
+  const [searchQuery, _setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const { user, fetchUserProfile } = useAuth();
   const navigate = useNavigate();
@@ -75,7 +74,7 @@ const Dashboard = () => {
     };
 
     fetchAllData();
-  }, []); // Remove fetchUserProfile dependency to prevent re-fetching on every render
+  }); // Remove fetchUserProfile dependency to prevent re-fetching on every render
 
   // Calculate dynamic stats based on user's actual progress
   const calculateStats = () => {
@@ -326,7 +325,7 @@ const Dashboard = () => {
 
   console.log("Final continueLearning:", continueLearning);
 
-  const schedule = [
+  const _schedule = [
     {
       title: "Machine Learning",
       time: "10:00 AM - 11:30 AM",

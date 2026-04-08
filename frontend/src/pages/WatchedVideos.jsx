@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useSidebar } from "../context/SidebarContext";
 import {
   Search,
   Bell,
@@ -18,7 +17,6 @@ import API_BASE_URL from "../lib/api";
 const WatchedVideos = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useSidebar();
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("All Courses");
   const [statusFilter, setStatusFilter] = useState("All Status");
@@ -76,7 +74,6 @@ const WatchedVideos = () => {
     );
   }
 
-  // Format last watched date
   const formatLastWatched = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -86,12 +83,10 @@ const WatchedVideos = () => {
     if (diffDays === 1) return "1 day ago";
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30)
-      return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? "s" : ""
-        } ago`;
+      return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? "s" : ""} ago`;
     return date.toLocaleDateString();
   };
 
-  // Filtered videos based on search and filters
   const filteredVideos = videoData.filter((video) => {
     const matchesSearch =
       video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -105,7 +100,6 @@ const WatchedVideos = () => {
     return matchesSearch && matchesCourse && matchesStatus;
   });
 
-  // Sort videos
   const sortedVideos = [...filteredVideos].sort((a, b) => {
     switch (sortBy) {
       case "Most Recent":
@@ -123,7 +117,6 @@ const WatchedVideos = () => {
 
   const MetricsCards = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {/* Total Hours */}
       <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -140,7 +133,6 @@ const WatchedVideos = () => {
         </div>
       </div>
 
-      {/* Videos Completed */}
       <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -157,7 +149,6 @@ const WatchedVideos = () => {
         </div>
       </div>
 
-      {/* Avg Session */}
       <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -174,7 +165,6 @@ const WatchedVideos = () => {
         </div>
       </div>
 
-      {/* Learning Streak */}
       <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -196,7 +186,6 @@ const WatchedVideos = () => {
   const SearchAndFilters = () => (
     <div className="bg-card rounded-xl border border-border p-4 md:p-6 shadow-sm mb-6 lg:mb-8">
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-        {/* Search Input */}
         <div className="relative w-full lg:flex-1 lg:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
           <input
@@ -208,7 +197,6 @@ const WatchedVideos = () => {
           />
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <select
             className="h-[43px] px-3 pr-8 border border-border rounded-lg bg-card text-main w-full sm:min-w-[160px]"
@@ -248,7 +236,6 @@ const WatchedVideos = () => {
 
   const VideoCard = ({ video }) => (
     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-      {/* Video Thumbnail */}
       <div className="relative">
         <img
           src={video.thumbnail}
@@ -258,21 +245,20 @@ const WatchedVideos = () => {
         <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
           {video.duration}
         </div>
-        {/* Progress Bar */}
         <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-300 dark:bg-gray-700">
           <div
-            className={`h-full ${video.status === "completed"
+            className={`h-full ${
+              video.status === "completed"
                 ? "bg-green-500"
                 : video.status === "in-progress"
-                  ? "bg-orange-500"
-                  : "bg-gray-400"
-              }`}
+                ? "bg-orange-500"
+                : "bg-gray-400"
+            }`}
             style={{ width: `${video.progress}%` }}
           ></div>
         </div>
       </div>
 
-      {/* Video Info */}
       <div className="p-4">
         <h3 className="text-main text-base font-semibold mb-1 line-clamp-1">
           {video.title}
@@ -292,20 +278,22 @@ const WatchedVideos = () => {
           <span>{formatLastWatched(video.lastWatched)}</span>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-2">
           <button
-            className={`flex-1 h-10 rounded-lg text-sm font-medium ${video.status === "completed"
+            className={`flex-1 h-10 rounded-lg text-sm font-medium ${
+              video.status === "completed"
                 ? "bg-canvas text-main hover:bg-canvas-alt"
                 : "bg-orange-500 text-white"
-              }`}
-            // --- VIDEO RESUME NAVIGATION FOR THE TEAM ---
-            // When the user clicks Resume, we navigate them to the course URL but WE ALSO PASS STATE.
-            // LearningPage uses `location.state.lessonId` to override the default course progression
-            // and forcefully jump the user to this specific video instead.
-            onClick={() => navigate(`/learning/${video.courseId}`, { state: { lessonId: video.lessonId } })}
+            }`}
+            onClick={() =>
+              navigate(`/learning/${video.courseId}`, {
+                state: { lessonId: video.lessonId },
+              })
+            }
           >
-            {video.status === "completed" ? t("watched.rewatch") : t("watched.resume")}
+            {video.status === "completed"
+              ? t("watched.rewatch")
+              : t("watched.resume")}
           </button>
           <button
             className="w-7 h-10 flex items-center justify-center text-muted hover:text-main"
@@ -320,37 +308,25 @@ const WatchedVideos = () => {
 
   return (
     <>
-        {/* Main Dashboard Content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          {/* Page Title */}
-          <div className="mb-6 lg:mb-8">
-            <h1
-              className="text-main text-2xl md:text-3xl font-bold mb-1"
-              style={{ fontFamily: "Poppins, sans-serif" }}
-            >
-              {t("watched.title")}
-            </h1>
-            <p
-              className="text-muted text-sm md:text-base"
-              style={{ fontFamily: "Poppins, sans-serif" }}
-            >
-              {t("watched.subtitle")}
-            </p>
-          </div>
+      <main className="flex-1 p-4 md:p-6 lg:p-8">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-main text-2xl md:text-3xl font-bold mb-1">
+            {t("watched.title")}
+          </h1>
+          <p className="text-muted text-sm md:text-base">
+            {t("watched.subtitle")}
+          </p>
+        </div>
 
-          {/* Metrics Cards */}
-          <MetricsCards />
+        <MetricsCards />
+        <SearchAndFilters />
 
-          {/* Search and Filters */}
-          <SearchAndFilters />
-
-          {/* Video Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
-            {sortedVideos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
-        </main>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
+          {sortedVideos.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
+        </div>
+      </main>
     </>
   );
 };

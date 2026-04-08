@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect,useMemo,useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams,useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useSidebar } from "../context/SidebarContext";
 import { getAIVideo } from "../service/aiService";
 import VideoPlayer from "../components/video/VideoPlayer";
 import AITranscript from "../components/video/AITranscript";
@@ -28,11 +27,11 @@ import {
 } from "lucide-react";
 
 // Sanitize filename to match backend logic: remove [\\/:*?"<>|], replace spaces with _
-function sanitizeFilename(name) {
+function SANITIZE_FILENAME(name) {
   return name.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_");
 }
 
-const getYouTubeVideoId = (url) => {
+const GET_YOUTUBE_VIDEO_ID = (url) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return match && match[2].length === 11 ? match[2] : null;
@@ -45,12 +44,12 @@ export default function Learning() {
   const navigate = useNavigate();
   const { id: courseId } = useParams();
   const { user, updateUser } = useAuth();
-  const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useSidebar();
+   const location = useLocation();
   const [learningData, setLearningData] = useState(null)
   const [expandedModule, setExpandedModule] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [_searchQuery, _setSearchQuery] = useState("");
   const [celebritySearch, setCelebritySearch] = useState("");
-  const [activeTab, setActiveTab] = useState("transcript");
+  const [_activeTab, _setActiveTab] = useState("transcript");
   const [isCelebrityModalOpen, setIsCelebrityModalOpen] = useState(false);
 
   // Captions state
@@ -59,11 +58,11 @@ export default function Learning() {
   const celebrities = ["Salman Khan", "Modi ji", "SRK"];
 
   // map celebrities to videos and vtt files
-  const celebrityVideoMap = {
+  const celebrityVideoMap =useMemo(() => ( {
     "Salman Khan": { video: "/videos/salman.mp4", vtt: "/videos/salman.vtt" },
     "Modi ji": { video: "/videos/modi.mp4", vtt: "/videos/modi.vtt" },
     SRK: { video: "/videos/srk.mp4", vtt: "/videos/srk.vtt" },
-  };
+  }),[]);
 
   const [selectedCelebrity, setSelectedCelebrity] = useState(null);
 
@@ -76,7 +75,7 @@ export default function Learning() {
   const [currentTime, setCurrentTime] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
   const [aiVideoUrl, setAiVideoUrl] = useState(null);
-  const [aiTranscript, setAiTranscript] = useState(null);
+  const [_aiTranscript, _setAiTranscript] = useState(null);
   const [isAIVideoLoading, setIsAIVideoLoading] = useState(false);
   const [generatedTextContent, setGeneratedTextContent] = useState("");
 
@@ -239,11 +238,12 @@ export default function Learning() {
           setLearningData(null);
         }
       } catch (error) {
+          console.error(error);
         setLearningData(null);
       }
     };
     fetchLearningData();
-  }, [courseId]);
+  }, [courseId, location.state.lessonId, user?.purchasedCourses]);
 
   // Reset restore flag when course changes
   useEffect(() => {
@@ -303,6 +303,9 @@ export default function Learning() {
         console.log(`✅ Parsed ${cues.length} captions from VTT`);
         setCaptions(cues);
       } catch (err) {
+         console.log(err);
+        setCaptions([]);
+  
         setCaptions([]);
       }
     };
@@ -333,7 +336,7 @@ export default function Learning() {
       return () => video.removeEventListener("loadedmetadata", handler);
     }
 
-  }, [selectedCelebrity, generatedTextContent, learningData?.currentLesson?.id]);
+  }, [selectedCelebrity,celebrityVideoMap, generatedTextContent, learningData?.currentLesson?.id]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -461,7 +464,7 @@ export default function Learning() {
     };
 
     loadVideo();
-  }, [learningData?.currentLesson?.id, selectedCelebrity]);
+  }, [learningData?.currentLesson?.id, selectedCelebrity,aiVideoUrl, courseId, learningData?.currentLesson, saveLessonData, user?.purchasedCourses]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -571,7 +574,7 @@ export default function Learning() {
     (lesson) => lesson.id === currentLesson?.id
   );
 
-  const saveLessonData = async (lessonId, data) => {
+  const saveLessonData =  useCallback(async (lessonId, data) => {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch("/api/users/course-progress", {
@@ -602,7 +605,7 @@ export default function Learning() {
     } catch (error) {
       console.error("Error saving lesson data:", error);
     }
-  };
+  },[courseId, modules, expandedModule, updateUser]);
 
   const completeLesson = async (lessonId) => {
     // Check if lesson is already completed
@@ -1226,7 +1229,7 @@ export default function Learning() {
                 {(generatedTextContent || currentLesson?.content?.introduction) && (
                   <div className="prose prose-lg max-w-none">
                     <p className="text-muted leading-relaxed">
-                      {generatedTextContent || currentLesson.content.introduction}
+                      {generatedTextContent || currentLesson?.content.introduction}
                     </p>
                   </div>
                 )}

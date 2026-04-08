@@ -87,7 +87,7 @@ const DiscussionsPage = () => {
   const getCategoryLabel = (cat) =>
     t(`discussions.${CATEGORY_KEY_MAP[cat]}`, cat);
   const { user } = useAuth();
-  const { sidebarCollapsed } = useSidebar();
+  const { _sidebarCollapsed } = useSidebar();
   const token = localStorage.getItem("token");
 
   //top level state
@@ -688,7 +688,7 @@ const DiscussionsPage = () => {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = () => {
       if (openDropdown) {
         setOpenDropdown(null);
       }

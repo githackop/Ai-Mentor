@@ -14,23 +14,19 @@ import {
 } from "../service/notificationService";
 import toast from "react-hot-toast";
 
-const Header = ({ searchQuery = "", onSearchChange }) => {
+const Header = () => {
   const { t } = useTranslation();
-  const { sidebarOpen, setSidebarOpen } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [internalSearchQuery, setInternalSearchQuery] = useState("");
   const { user, logout } = useAuth();
+  const { sidebarOpen, setSidebarOpen } = useSidebar();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // Notifications State
   const [notifications, setNotifications] = useState([]);
 
-  // Relative Time Formatter helper
   const formatRelativeTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -42,13 +38,11 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
 
-  // Fetch Notifications
   const loadNotifications = useCallback(async () => {
     if (!user) return;
     try {
       setLoading(true);
       const data = await fetchNotifications();
-      // Format the date for the UI
       const formattedData = data.map(n => ({
         ...n,
         time: formatRelativeTime(n.createdAt)
@@ -63,14 +57,10 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
 
   useEffect(() => {
     loadNotifications();
-    // Optional: Set up polling or websocket here
   }, [loadNotifications]);
 
   const unreadCount = notifications.filter(n => n.unread).length;
-  const effectiveSearchQuery =
-    typeof onSearchChange === "function" ? searchQuery : internalSearchQuery;
 
-  // ReferenceError se bachne ke liye displayName ko sabse upar define karein
   const displayName = user?.name || user?.email?.split('@')[0] || "User";
 
   const handleLogout = () => {
@@ -88,7 +78,6 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
     setDropdownOpen((prev) => !prev);
   };
 
-  // Bahar click karne par dropdown band karne ka logic
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -96,11 +85,6 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
       }
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setNotifOpen(false);
-      }
-
-      if (window.innerWidth < 1024 && !dropdownRef.current?.contains(event.target) && !notificationRef.current?.contains(event.target)) {
-        // Only close sidebar if clicking outside both dropdowns on mobile
-        // Note: sidebar logic might be different depending on requirements
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -113,6 +97,7 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
       setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
       toast.success("Marked all as read");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to mark all as read");
     }
   };
@@ -132,6 +117,7 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
       setNotifications([]);
       toast.success("Notifications cleared");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to clear notifications");
     }
   };
@@ -140,8 +126,6 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
     <>
       <header className="bg-card/80 backdrop-blur-xl border-b border-border/50 px-6 py-4 fixed top-0 left-0 right-0 w-full z-[100]">
         <div className="flex items-center justify-between w-full">
-
-          {/* Mobile Menu & Logo */}
           <div className="flex items-center space-x-4">
             <button
               className="lg:hidden p-2 rounded-xl bg-card border border-border hover:bg-canvas-alt transition-all"
@@ -151,19 +135,10 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
             </button>
 
             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
-              {/* ✅ UPDATED: Yahan purana logo lagaya gaya hai */}
-              <img
-                src="/upto.png"
-                alt="UptoSkills Logo"
-                className="h-10 w-auto"
-              />
+              <img src="/upto.png" alt="UptoSkills Logo" className="h-10 w-auto" />
             </div>
           </div>
 
-          {/* Search Bar (Mobile par hidden) */}
-
-
-          {/* Action Buttons & Profile */}
           <div className="flex items-center space-x-5">
             <ThemeToggle />
 
@@ -180,7 +155,6 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
                 )}
               </div>
 
-              {/* Notification Dropdown - Responsive Positioning */}
               {notifOpen && (
                 <div className="fixed md:absolute right-4 left-4 md:right-0 md:left-auto mt-4 md:w-96 bg-card border border-border/50 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[110] overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
                   <div className="p-6 bg-gradient-to-br from-teal-500/10 via-blue-500/5 to-transparent border-b border-border/50 flex items-center justify-between">
@@ -191,24 +165,17 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <button
-                        onClick={markAllRead}
-                        className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:text-teal-500 transition-colors uppercase tracking-wider"
-                      >
+                      <button onClick={markAllRead} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:text-teal-500 transition-colors uppercase tracking-wider">
                         Mark all read
                       </button>
                       {notifications.length > 0 && (
-                        <button
-                          onClick={clearAll}
-                          className="text-[10px] font-black text-red-500 hover:text-red-600 transition-colors uppercase tracking-wider"
-                        >
+                        <button onClick={clearAll} className="text-[10px] font-black text-red-500 hover:text-red-600 transition-colors uppercase tracking-wider">
                           Clear All
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* Updated max-h to show ~4 notifications before scrolling */}
                   <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                     {loading ? (
                       <div className="p-12 text-center">
@@ -237,7 +204,6 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
               )}
             </div>
 
-            {/* PROFILE DROPDOWN SECTION */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
@@ -254,7 +220,6 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
                 <span className="text-sm font-bold text-main hidden lg:block">{displayName}</span>
               </button>
 
-              {/* Impressive Floating Menu */}
               {dropdownOpen && (
                 <div className="absolute right-0 mt-4 w-72 bg-card/95 backdrop-blur-2xl border border-border/50 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[110] overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
                   <div className="p-6 bg-gradient-to-br from-teal-500/10 via-blue-500/5 to-transparent border-b border-border/50">
@@ -294,6 +259,7 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
           </div>
         </div>
       </header>
+
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-card border border-border/50 rounded-[2rem] shadow-2xl p-8 w-80 text-center">

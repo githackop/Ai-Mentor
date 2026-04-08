@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Star, Bookmark, X, BookOpen, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { useSidebar } from "../context/SidebarContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import API_BASE_URL from "../lib/api";
 import { useTranslation } from "react-i18next";
 
 const CoursesPage = () => {
   const { t } = useTranslation();
-  const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useSidebar();
   const [activeTab, setActiveTab] = useState("my-courses");
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -16,7 +14,7 @@ const CoursesPage = () => {
   /* ================= STATE ================= */
   const [exploreCourses, setExploreCourses] = useState([]);
   const [myCourses, setMyCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [showEnrollPopup, setShowEnrollPopup] = useState(false);
