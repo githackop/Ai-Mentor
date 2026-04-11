@@ -556,24 +556,6 @@ export default function Learning() {
   // }, [selectedCelebrity, videoRef.current]);
 
   const { modules, currentLesson } = learningData || {};
-
-  if (!learningData) {
-    return (
-      <div className="min-h-screen bg-canvas-alt flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-muted">{t("learning.loading")}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Flatten modules into a single lessons list and compute current index
-  const allLessons = (modules || []).flatMap((module) => module.lessons || []);
-  const currentLessonIndex = allLessons.findIndex(
-    (lesson) => lesson.id === currentLesson?.id
-  );
-
   const saveLessonData =  useCallback(async (lessonId, data) => {
     try {
       const token = localStorage.getItem("token");
@@ -607,6 +589,24 @@ export default function Learning() {
     }
   },[courseId, modules, expandedModule, updateUser]);
 
+  if (!learningData) {
+    return (
+      <div className="min-h-screen bg-canvas-alt flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-muted">{t("learning.loading")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Flatten modules into a single lessons list and compute current index
+  const allLessons = (modules || []).flatMap((module) => module.lessons || []);
+  const currentLessonIndex = allLessons.findIndex(
+    (lesson) => lesson.id === currentLesson?.id
+  );
+
+ 
   const completeLesson = async (lessonId) => {
     // Check if lesson is already completed
     const courseProgress = user?.purchasedCourses?.find(
