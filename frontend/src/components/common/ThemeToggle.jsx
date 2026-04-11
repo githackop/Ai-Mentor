@@ -1,6 +1,6 @@
 // frontend/src/components/common/ThemeToggle.jsx
 import { Sun, Moon } from "lucide-react";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../context/useTheme";
 
 const ThemeToggle = () => {
   const {  setTheme, isDark } = useTheme();

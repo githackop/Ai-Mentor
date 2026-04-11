@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 
-const SidebarContext = createContext();
+export const SidebarContext = createContext();
 
 export const SidebarProvider = ({ children }) => {
     // sidebarOpen is for mobile/tablet responsive view

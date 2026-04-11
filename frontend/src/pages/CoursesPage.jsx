@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Star, Bookmark, X, BookOpen, Search } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 import API_BASE_URL from "../lib/api";
 import { useTranslation } from "react-i18next";

@@ -1,7 +1,7 @@
 import React from "react";
 import logoGoogle from "../../assets/images/google.jpg";
 import { auth, googleProvider, signInWithPopup } from "../../firebase"; // Adjust path if needed
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import toast from "react-hot-toast";
 
 const SocialLogin = () => {

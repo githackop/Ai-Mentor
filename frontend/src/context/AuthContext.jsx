@@ -1,5 +1,6 @@
 // frontend/src/context/AuthContext.jsx
 import React, { createContext,useState, useEffect, useCallback } from 'react';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -112,3 +113,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+export { AuthContext };

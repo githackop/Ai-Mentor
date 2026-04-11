@@ -2,7 +2,7 @@ import { useState, useRef, useEffect,useMemo,useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useNavigate, useParams,useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { getAIVideo } from "../service/aiService";
 import VideoPlayer from "../components/video/VideoPlayer";
 import AITranscript from "../components/video/AITranscript";

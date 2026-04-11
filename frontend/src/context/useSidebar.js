@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import {SidebarContext} from "./AuthContext";
+import {SidebarContext} from "./SidebarContext";
 export const useSidebar = () => {
     const context = useContext(SidebarContext);
     if (!context) {

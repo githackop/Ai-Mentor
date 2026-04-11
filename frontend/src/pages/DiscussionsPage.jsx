@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useSidebar } from "../context/SidebarContext";
+import { useAuth } from "../context/useAuth";
+import { useSidebar } from "../context/useSidebar";
 import { useTranslation } from "react-i18next";
 import {
   MessageCircle,

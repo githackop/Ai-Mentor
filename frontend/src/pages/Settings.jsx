@@ -1,7 +1,7 @@
 // frontend/src/pages/Settings.jsx
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useSidebar } from "../context/SidebarContext";
+import { useAuth } from "../context/useAuth";
+import { useSidebar } from "../context/useSidebar";
 import {
   User,
   Bell,
@@ -14,7 +14,7 @@ import {
   UserX
 } from "lucide-react";
 import axios from "axios";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../context/useTheme";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n/index.js";

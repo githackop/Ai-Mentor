@@ -10,7 +10,7 @@ import {
   FileText,
 } from "lucide-react";
 import API_BASE_URL from "../lib/api";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 const CertificatesPage = () => {
   const { user } = useAuth();
