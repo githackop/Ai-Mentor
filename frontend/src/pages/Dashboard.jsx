@@ -74,7 +74,7 @@ const Dashboard = () => {
     };
 
     fetchAllData();
-  }); // Remove fetchUserProfile dependency to prevent re-fetching on every render
+  },[]); // Remove fetchUserProfile dependency to prevent re-fetching on every render
 
   // Calculate dynamic stats based on user's actual progress
   const calculateStats = () => {
